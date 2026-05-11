@@ -1,8 +1,12 @@
 # eda-parse
 
-`eda-parse` is an MIT-licensed Python library for turning common EDA file formats into structured, LLM-friendly documents. It parses real Liberty and LEF files into typed chunks with metadata, while preserving access to the underlying AST for users who need lower-level inspection.
+[![ci](https://github.com/caliburlabs/eda-parse/actions/workflows/ci.yml/badge.svg)](https://github.com/caliburlabs/eda-parse/actions/workflows/ci.yml)
+[![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-The immediate use case is retrieval over chip-design artifacts: standard-cell libraries, physical abstracts, constraints, waveforms, timing reports, and tool outputs. The first release focuses on Liberty and LEF because those formats give useful coverage across timing, power, and physical-design context.
+`eda-parse` is an MIT-licensed Python library for turning common EDA file formats into structured, LLM-friendly documents. It parses real Liberty, LEF, and SDC files into typed chunks with metadata, while preserving access to the underlying AST for users who need lower-level inspection.
+
+The immediate use case is retrieval over chip-design artifacts: standard-cell libraries, physical abstracts, constraints, waveforms, timing reports, and tool outputs. The first releases focus on Liberty, LEF, and SDC because those formats together give useful coverage across timing, power, physical design, and design-intent context.
 
 ## Install
 
@@ -38,14 +42,33 @@ print(doc.metadata["macro_count"])
 print(doc.chunks[0].metadata["pin_count"])
 ```
 
+### SDC
+
+```python
+from eda_parse.parsers import sdc
+
+doc = sdc.parse("gcd.sdc")
+print(doc.metadata["clock_count"], doc.metadata["input_delay_count"])
+clocks = [c for c in doc.chunks if c.kind == "clock"]
+print(clocks[0].metadata)  # → {'period': 5.0, 'ports': '[get_ports clk]', ...}
+```
+
 ### LangChain
 
 ```python
-from eda_parse.loaders import LibertyLoader
+from eda_parse.loaders import LibertyLoader, LEFLoader, SDCLoader
 
 docs = LibertyLoader("sky130hd_tt.lib.gz").load()
 print(docs[0].page_content)
 ```
+
+### Demo: structured QA over a real corpus
+
+```bash
+python examples/demo_corpus_qa.py
+```
+
+Answers five concrete questions ("What clocks exist?", "What cells/macros are available?", "What PVT corner is this characterized for?", plus a cross-document sanity check) without any embedding model or LLM. Pure metadata filtering on what the parsers extracted. The optional `--with-rag` flag layers a sentence-transformer + FAISS retriever on top for the genuinely open-ended questions.
 
 ## Document Model
 
@@ -69,8 +92,8 @@ Chunks are semantic retrieval units. Liberty emits one chunk per `cell`; LEF emi
 | --- | --- | --- | --- |
 | Liberty `.lib`, `.lib.gz` | Implemented | `cell` | ASAP7, SKY130 |
 | LEF `.lef`, `.tlef` | Implemented | `MACRO` | SKY130 |
+| SDC `.sdc` | Implemented | one chunk per constraint (clock, input_delay, output_delay, false_path, multicycle_path, clock_groups, …) | SKY130 (gcd) |
 | DEF | Planned | components, nets, rows | Not yet shipped |
-| SDC | Planned | clocks, constraints, exceptions | Fixture present, parser pending |
 | VCD | Planned | scopes, signals, transitions | Not yet shipped |
 | SPEF | Planned | nets, parasitics | Fixture present, parser pending |
 

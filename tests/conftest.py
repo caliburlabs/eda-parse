@@ -30,3 +30,8 @@ def lef_sky130_tech() -> Path:
 @pytest.fixture
 def lef_sky130_merged() -> Path:
     return FIXTURES / "lef" / "sky130_fd_sc_hd_merged.lef"
+
+
+@pytest.fixture
+def sdc_gcd_sky130() -> Path:
+    return FIXTURES / "sdc" / "gcd_sky130hd.sdc"
