@@ -3,4 +3,4 @@
 from eda_parse.types import Chunk, ParsedDocument
 
 __all__ = ["Chunk", "ParsedDocument", "__version__"]
-__version__ = "0.2.0"
+__version__ = "0.2.1"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "eda-parse"
-version = "0.2.0"
+version = "0.2.1"
 description = "Unified, LLM-friendly parsers for industry-standard EDA file formats (Liberty, LEF, DEF, VCD, SDC, SPEF)."
 readme = "README.md"
 license = { text = "MIT" }
