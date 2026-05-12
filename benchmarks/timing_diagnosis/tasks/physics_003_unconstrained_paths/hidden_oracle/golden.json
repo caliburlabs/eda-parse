@@ -1,0 +1,33 @@
+{
+  "task_id": "physics_003_unconstrained_paths",
+  "oracle_type": "physics_first_principles",
+  "provenance": {
+    "status": "seed_fixture_not_external_sta",
+    "note": "The design port is clk, while the SDC targets clk_core; the frozen report therefore has no constrained timing paths."
+  },
+  "required_exact": {
+    "failing_stage": "constraint_check",
+    "violation_type": "unconstrained_paths",
+    "root_cause": [
+      "clock_port_mismatch",
+      "clock_target_mismatch"
+    ],
+    "clock": "core_clk"
+  },
+  "required_numeric": {
+    "declared_period_ns": {
+      "value": 2.0,
+      "tolerance": 0.001
+    }
+  },
+  "required_evidence": [
+    "constraints.sdc",
+    "timing_report.rpt",
+    "design.v"
+  ],
+  "required_next_action_terms": [
+    "clk",
+    "clk_core"
+  ]
+}
+

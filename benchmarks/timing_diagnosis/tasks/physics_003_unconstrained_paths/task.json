@@ -1,0 +1,15 @@
+{
+  "task_id": "physics_003_unconstrained_paths",
+  "title": "No constrained timing paths because the clock targets the wrong port",
+  "workflow": "timing_diagnosis",
+  "oracle_type": "physics_first_principles",
+  "oracle_status": "seed_fixture_not_external_sta",
+  "prompt": "prompt.md",
+  "golden": "hidden_oracle/golden.json",
+  "input_artifacts": [
+    "input/design.v",
+    "input/constraints.sdc",
+    "input/reports/timing_report.rpt"
+  ]
+}
+

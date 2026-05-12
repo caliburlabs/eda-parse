@@ -39,3 +39,6 @@ jobs:
 
       - name: Workflow testbench
         run: python benchmarks/workflow_testbench.py
+
+      - name: Timing diagnosis task validation
+        run: python benchmarks/timing_diagnosis/run.py validate

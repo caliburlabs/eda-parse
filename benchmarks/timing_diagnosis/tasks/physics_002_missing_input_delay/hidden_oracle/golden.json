@@ -1,0 +1,33 @@
+{
+  "task_id": "physics_002_missing_input_delay",
+  "oracle_type": "physics_first_principles",
+  "provenance": {
+    "status": "seed_fixture_not_external_sta",
+    "note": "The SDC creates core_clk and output delay but omits set_input_delay for data_in[*] and valid_in; the frozen report flags those ports."
+  },
+  "required_exact": {
+    "failing_stage": "constraint_check",
+    "violation_type": "constraint_coverage",
+    "root_cause": "missing_input_delay",
+    "clock": "core_clk"
+  },
+  "required_numeric": {
+    "declared_period_ns": {
+      "value": 5.0,
+      "tolerance": 0.001
+    },
+    "unconstrained_input_count": {
+      "value": 5.0,
+      "tolerance": 0.001
+    }
+  },
+  "required_evidence": [
+    "constraints.sdc",
+    "timing_report.rpt"
+  ],
+  "required_next_action_terms": [
+    "set_input_delay",
+    "core_clk"
+  ]
+}
+

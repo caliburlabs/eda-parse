@@ -1,0 +1,40 @@
+{
+  "task_id": "physics_001_overconstrained_clock",
+  "oracle_type": "physics_first_principles",
+  "provenance": {
+    "status": "seed_fixture_not_external_sta",
+    "note": "The setup slack follows directly from the frozen report arithmetic: required 1.00 ns - arrival 1.42 ns = -0.42 ns."
+  },
+  "required_exact": {
+    "failing_stage": "static_timing",
+    "violation_type": "setup",
+    "root_cause": [
+      "clock_period_too_short",
+      "overconstrained_clock"
+    ],
+    "clock": "core_clk"
+  },
+  "required_numeric": {
+    "declared_period_ns": {
+      "value": 1.0,
+      "tolerance": 0.001
+    },
+    "worst_slack_ns": {
+      "value": -0.42,
+      "tolerance": 0.001
+    },
+    "minimum_passing_period_ns": {
+      "value": 1.42,
+      "tolerance": 0.01
+    }
+  },
+  "required_evidence": [
+    "constraints.sdc",
+    "timing_report.rpt"
+  ],
+  "required_next_action_terms": [
+    "relax",
+    "period"
+  ]
+}
+

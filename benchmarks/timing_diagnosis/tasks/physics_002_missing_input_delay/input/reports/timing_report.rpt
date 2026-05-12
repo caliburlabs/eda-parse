@@ -1,0 +1,13 @@
+Report : check_timing
+Design: timing_seed_missing_input_delay
+
+Warning: The following input ports have no input delay relative to clock core_clk:
+  data_in[0]
+  data_in[1]
+  data_in[2]
+  data_in[3]
+  valid_in
+
+Timing paths are partially constrained.
+Coverage status: FAILED
+

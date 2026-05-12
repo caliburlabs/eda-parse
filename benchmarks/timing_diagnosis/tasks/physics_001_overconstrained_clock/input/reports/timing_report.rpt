@@ -1,0 +1,23 @@
+Report : timing
+Path Type: max
+Analysis: setup
+Design: timing_seed_overconstrained_clock
+
+Startpoint: stage_reg[2]
+Endpoint: y_reg[5]
+Path Group: core_clk
+
+clock core_clk (rise edge)                         0.00      0.00
+stage_reg[2]/Q                                     0.18      0.18
+u_logic_0/Y                                        0.31      0.49
+u_logic_1/Y                                        0.28      0.77
+u_logic_2/Y                                        0.25      1.02
+y_reg[5]/D                                         0.00      1.42
+data arrival time                                            1.42
+
+clock core_clk (rise edge)                         1.00      1.00
+library setup time                                -0.00      1.00
+data required time                                           1.00
+
+slack (VIOLATED)                                            -0.42
+

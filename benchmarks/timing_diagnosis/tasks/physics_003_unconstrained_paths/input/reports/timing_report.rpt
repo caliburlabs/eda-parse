@@ -1,0 +1,9 @@
+Report : timing
+Design: timing_seed_unconstrained_paths
+
+Warning: create_clock source [get_ports clk_core] did not match any design port.
+Warning: Clock core_clk has no sinks.
+
+No constrained timing paths found.
+Design may not be constrained or library is missing timing information.
+

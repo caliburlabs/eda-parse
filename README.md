@@ -78,6 +78,15 @@ python benchmarks/workflow_testbench.py
 
 Runs the public workflow acceptance test: parse SKY130 Liberty + SKY130 merged LEF + gcd SDC, verify known extracted facts, verify 873 retrieval chunks, answer the five concrete workflow questions, and fail if the corpus parse exceeds the ingest budget. See `docs/testbench.md`.
 
+### Timing-diagnosis harness
+
+```bash
+python benchmarks/timing_diagnosis/run.py list
+python benchmarks/timing_diagnosis/run.py validate
+```
+
+Starts the agent-benchmark side of the project: frozen timing-diagnosis tasks with visible inputs and hidden golden answers. The checked-in seed tasks are first-principles harness fixtures; the intended external checks are OpenSTA/PrimeTime-generated tasks and sealed authority cases. See `benchmarks/timing_diagnosis/README.md`.
+
 ## Document Model
 
 Every parser returns a `ParsedDocument`:
@@ -117,6 +126,7 @@ ruff check src tests benchmarks
 mypy src/eda_parse
 pytest -ra
 python benchmarks/workflow_testbench.py
+python benchmarks/timing_diagnosis/run.py validate
 ```
 
 ## Contributing

@@ -56,3 +56,14 @@ Notes:
 - TCL bracket expressions (`[expr ...]`, `[get_ports clk]`) are captured as text, not evaluated. Documented as a known limitation.
 - Brace-list contents are joined with single spaces (we tokenize first, so original whitespace inside `{...}` is lost). Cosmetic; downstream consumers can re-normalize.
 - The `gcd` SDC names design-level ports, not library cells — the cross-doc Q5 in the demo correctly reports zero matches and explains why. Future demos with synthesized netlists will give richer cross-doc joins.
+
+## Agent-benchmark direction (2026-05-11)
+
+Added `benchmarks/timing_diagnosis/` as the first harness for the agent-workflow side of the project. This is deliberately separate from the parser acceptance testbench:
+
+- Parser testbench asks: "Did `eda-parse` extract stable facts from real public artifacts?"
+- Timing-diagnosis harness asks: "Can an agent inspect timing artifacts, diagnose a failure, cite evidence, and propose a concrete next action?"
+
+The harness uses a visible/hidden split: agents see `prompt.md` and `input/`; graders see `hidden_oracle/golden.json`. The same schema can grade first-principles seed tasks, OpenSTA/PrimeTime-generated physics tasks, and sealed authority cases written by a human or pulled from trusted public issue resolutions.
+
+Current seed tasks are marked `physics_first_principles` / `seed_fixture_not_external_sta`. They are for validating the harness contract only. The high-signal next step is to add one sealed `external_authority` timing-failure case and one regenerated `external_tool` OpenSTA/PrimeTime case.
