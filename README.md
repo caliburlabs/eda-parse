@@ -70,6 +70,14 @@ python examples/demo_corpus_qa.py
 
 Answers five concrete questions ("What clocks exist?", "What cells/macros are available?", "What PVT corner is this characterized for?", plus a cross-document sanity check) without any embedding model or LLM. Pure metadata filtering on what the parsers extracted. The optional `--with-rag` flag layers a sentence-transformer + FAISS retriever on top for the genuinely open-ended questions.
 
+### Acceptance testbench
+
+```bash
+python benchmarks/workflow_testbench.py
+```
+
+Runs the public workflow acceptance test: parse SKY130 Liberty + SKY130 merged LEF + gcd SDC, verify known extracted facts, verify 873 retrieval chunks, answer the five concrete workflow questions, and fail if the corpus parse exceeds the ingest budget. See `docs/testbench.md`.
+
 ## Document Model
 
 Every parser returns a `ParsedDocument`:
@@ -105,9 +113,10 @@ The committed fixtures are redistributable public files from OpenSTA and OpenROA
 python -m venv .venv
 . .venv/bin/activate
 pip install -e ".[dev,langchain]"
-ruff check src tests
+ruff check src tests benchmarks
 mypy src/eda_parse
 pytest -ra
+python benchmarks/workflow_testbench.py
 ```
 
 ## Contributing

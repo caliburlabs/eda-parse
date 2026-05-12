@@ -29,10 +29,13 @@ jobs:
           pip install -e ".[langchain,dev]"
 
       - name: Ruff
-        run: ruff check src tests
+        run: ruff check src tests benchmarks
 
       - name: Mypy
         run: mypy src/eda_parse
 
       - name: Pytest
         run: pytest -ra --cov=eda_parse --cov-report=term-missing
+
+      - name: Workflow testbench
+        run: python benchmarks/workflow_testbench.py
