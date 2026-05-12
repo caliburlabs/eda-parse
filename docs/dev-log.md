@@ -67,3 +67,29 @@ Added `benchmarks/timing_diagnosis/` as the first harness for the agent-workflow
 The harness uses a visible/hidden split: agents see `prompt.md` and `input/`; graders see `hidden_oracle/golden.json`. The same schema can grade first-principles seed tasks, OpenSTA/PrimeTime-generated physics tasks, and sealed authority cases written by a human or pulled from trusted public issue resolutions.
 
 Current seed tasks are marked `physics_first_principles` / `seed_fixture_not_external_sta`. They are for validating the harness contract only. The high-signal next step is to add one sealed `external_authority` timing-failure case and one regenerated `external_tool` OpenSTA/PrimeTime case.
+
+## Agent runner + first authority case (2026-05-11, later)
+
+The "subject side" of the bench landed:
+
+- **`benchmarks/timing_diagnosis/agent.py`** — Claude-callable agent runner with sandboxed tool surface (`read_file`, `list_dir`, `grep`, `parse_liberty`, `parse_lef`, `parse_sdc`, `final_answer`). All file paths sandbox to `task_dir/input/` so the agent can never reach `hidden_oracle/`. Two `ModelClient` implementations: `AnthropicClient` (real SDK with adaptive thinking + effort + prompt caching on system+tools prefix) and `MockClient` (replays scripted JSON of model turns — used by every test in CI, zero API calls). The `final_answer` tool's `input_schema` exactly matches the grader's contract: failing_stage / violation_type / root_cause / clock / three numerics / evidence[] / next_action / confidence / additional_fields (which the runner flattens onto the top level before grading).
+- **`tests/test_timing_diagnosis_agent.py`** — 14 tests covering sandbox safety, tool round-trips, end-to-end mock-driven loop scoring PASS at 100% on `physics_001`, additional_fields flattening, max_iters exhaustion stub, error recovery on bad tool args, transcript JSONL.
+- **`benchmarks/timing_diagnosis/tasks/authority_001_ol_1371_hold_repair_setup_conflict/`** — first real external-authority case. Sourced from OpenLane GitHub issue #1371, where James Cherry (jjcherry56, OpenSTA author), Anton Blanchard (antonblanchard, IBM/Linux kernel), and Mohamed Gaber (donn, OpenLane lead) diagnosed a hold-repair-blocked-by-setup-violations failure. Real artifacts (1.2 MB after stripping the synthesized netlist): the failing `16-resizer.log` with `RSZ-0064 Unable to repair all hold checks within margin`, the OpenLane scripts, the SDC files, the env (with `GLB_RESIZER_ALLOW_SETUP_VIOS=0`). The grader-shaped `golden.json` lives beside `provenance.md` which carries the verbatim quotes + fix commit (`openroad 79313e90d`) + the audit trail. Validates structurally and grades PASS at 100% on a mock answer.
+
+Schema-mismatch lesson surfaced this session: research-Claude's first curation pass produced rich-format goldens (`verbatim_diagnoses[]`, `fix_commit`, `grading_rubric`) that the grader doesn't read. Resolution: keep the grader contract minimal and uniform; rich content goes in `provenance.md` beside `golden.json`. The split is now documented in `docs/golden-schema.md` so future curation agents produce grader-compatible output directly.
+
+Codex's harness test got patched from "exactly the 3 physics seeds" to "physics seeds present and every loaded task validates" so the corpus can grow without breaking the test.
+
+Repo state: 42/42 pytest pass, ruff clean, mypy `--strict` clean across 9 source files. Working tree has the agent + first authority case + AGENTS.md + docs uncommitted; coordinated commits coming.
+
+## Operating manual + roadmap (2026-05-11, later still)
+
+Added the documents that let other agents pick up work without re-deriving the principles:
+
+- **`AGENTS.md`** at repo root — the operating manual. Quick orientation, engineering invariants, multi-agent collaboration rules, the chamber-check rule, the two-sided artifact pattern, authority-case curation playbook, attribution obligations.
+- **`docs/PLAN.md`** — current state, the 16 verified candidate authority cases queued for wiring, ranked open work (real Anthropic API call against authority_001 is the highest-signal next move), things-to-not-do.
+- **`docs/bench-design.md`** — design philosophy of the bench: two parts built together, two-tier oracle (physics + authority), chamber-check principle, visible/hidden split, schema-as-API, why TerminalBench shape, what the bench is *not*, honest open gaps.
+- **`docs/golden-schema.md`** — exact spec for `hidden_oracle/golden.json` so future curation agents (especially research-Claude on subsequent passes) produce grader-compatible output directly. Worked example uses the OL-1371 case.
+- **`docs/why.md`** — updated with SemiAnalysis 2026 framing: 50%/year complexity vs 20%/year productivity gap; verification = 70% of effort; Big Three (Synopsys/Cadence/Siemens) + NVIDIA all have private agentic flows; the wedge is openness + observability + measurement, not building a better closed agent.
+
+These are durable; future agents in cold-context sessions can pick up where this one left off without losing the principles.
