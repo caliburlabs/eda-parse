@@ -72,7 +72,7 @@ def test_safe_input_path_rejects_hidden_oracle_via_input_prefix() -> None:
 def test_read_file_returns_sdc_contents() -> None:
     task = TASKS_ROOT / "physics_001_overconstrained_clock"
     text = _tool_read_file(task, path="constraints.sdc")
-    assert "create_clock" in text
+    assert "1: create_clock" in text
 
 
 def test_list_dir_shows_reports_subdir() -> None:

@@ -26,6 +26,7 @@
     "violation_type": "hold",
     "root_cause": [
       "hold_repair_blocked_by_setup_violations",
+      "hold_repair_blocked_by_setup_margin_guard",
       "setup_violations_block_hold_repair",
       "hold_fixup_disabled_when_setup_violates",
       "allow_setup_violations_disabled"

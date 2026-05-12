@@ -34,7 +34,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from eda_parse.parsers import lef, liberty, sdc
 
@@ -103,6 +103,10 @@ def _truncate(text: str) -> str:
     )
 
 
+def _with_line_numbers(text: str) -> str:
+    return "\n".join(f"{line_no}: {line}" for line_no, line in enumerate(text.splitlines(), 1))
+
+
 def _tool_read_file(task_dir: Path, *, path: str) -> str:
     p = _safe_input_path(task_dir, path)
     if not p.exists():
@@ -111,8 +115,8 @@ def _tool_read_file(task_dir: Path, *, path: str) -> str:
         return f"ERROR: {path!r} is not a regular file"
     if p.suffix == ".gz":
         with gzip.open(p, "rt", encoding="utf-8", errors="replace") as fh:
-            return _truncate(fh.read())
-    return _truncate(p.read_text(encoding="utf-8", errors="replace"))
+            return _truncate(_with_line_numbers(fh.read()))
+    return _truncate(_with_line_numbers(p.read_text(encoding="utf-8", errors="replace")))
 
 
 def _tool_list_dir(task_dir: Path, *, path: str = "") -> str:
@@ -327,7 +331,8 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
         "name": "read_file",
         "description": (
             "Read a file from the task's input/ directory and return its text "
-            "contents. Paths must be inside input/ — anything else is rejected. "
+            "contents with 1-based line numbers. Paths must be inside input/ — "
+            "anything else is rejected. "
             "Both 'constraints.sdc' and 'input/constraints.sdc' work. Gzipped "
             "files (.gz) are decompressed transparently. Output truncated at "
             f"~{_MAX_TOOL_OUTPUT_CHARS} characters."
@@ -581,7 +586,8 @@ class AnthropicClient:
         if self.model.startswith(_EFFORT_AWARE_PREFIXES):
             extra["output_config"] = {"effort": self.effort}
 
-        response = self._client.messages.create(
+        create_message = cast(Any, self._client.messages.create)
+        response = create_message(
             model=self.model,
             max_tokens=self.max_tokens,
             system=system,

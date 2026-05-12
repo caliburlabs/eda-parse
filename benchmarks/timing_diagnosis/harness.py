@@ -13,6 +13,7 @@ OpenSTA/PrimeTime tasks, and sealed authority tasks written by a human oracle.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -161,9 +162,9 @@ def grade_payload(task: TimingDiagnosisTask, payload: dict[str, Any]) -> GradeRe
     golden = task.golden()
     checks: list[FieldCheck] = []
 
-    checks.extend(_grade_exact_fields(golden, payload))
+    checks.extend(_grade_exact_fields(task, golden, payload))
     checks.extend(_grade_numeric_fields(golden, payload))
-    checks.extend(_grade_evidence(golden, payload))
+    checks.extend(_grade_evidence(task, golden, payload))
     checks.extend(_grade_next_action_terms(golden, payload))
 
     passed_count = sum(1 for check in checks if check.passed)
@@ -178,7 +179,9 @@ def grade_payload(task: TimingDiagnosisTask, payload: dict[str, Any]) -> GradeRe
     )
 
 
-def _grade_exact_fields(golden: dict[str, Any], payload: dict[str, Any]) -> list[FieldCheck]:
+def _grade_exact_fields(
+    task: TimingDiagnosisTask, golden: dict[str, Any], payload: dict[str, Any]
+) -> list[FieldCheck]:
     checks: list[FieldCheck] = []
     required = golden.get("required_exact", {})
     if not isinstance(required, dict):
@@ -186,10 +189,14 @@ def _grade_exact_fields(golden: dict[str, Any], payload: dict[str, Any]) -> list
 
     for field, expected in required.items():
         observed = payload.get(field)
+        if field == "root_cause" and task.oracle_type == "external_authority":
+            passed = _matches_root_cause(observed, expected)
+        else:
+            passed = _matches_expected(observed, expected)
         checks.append(
             FieldCheck(
                 f"exact:{field}",
-                _matches_expected(observed, expected),
+                passed,
                 observed,
                 expected,
             )
@@ -222,7 +229,15 @@ def _grade_numeric_fields(golden: dict[str, Any], payload: dict[str, Any]) -> li
     return checks
 
 
-def _grade_evidence(golden: dict[str, Any], payload: dict[str, Any]) -> list[FieldCheck]:
+_INPUT_LINE_REF_RE = re.compile(
+    r"(?P<path>input/[^\s:]+):(?P<start>\d+)(?:\s*[-\u2013]\s*(?P<end>\d+))?"
+)
+_EVIDENCE_CONTEXT_RADIUS = 2
+
+
+def _grade_evidence(
+    task: TimingDiagnosisTask, golden: dict[str, Any], payload: dict[str, Any]
+) -> list[FieldCheck]:
     evidence = payload.get("evidence", [])
     if isinstance(evidence, str):
         evidence_items = [evidence]
@@ -230,7 +245,8 @@ def _grade_evidence(golden: dict[str, Any], payload: dict[str, Any]) -> list[Fie
         evidence_items = [str(item) for item in evidence]
     else:
         evidence_items = []
-    evidence_text = "\n".join(evidence_items).lower()
+    cited_lines = _read_cited_input_lines(task, evidence_items)
+    evidence_text = "\n".join([*evidence_items, *cited_lines]).lower()
 
     checks: list[FieldCheck] = []
     for token in golden.get("required_evidence", []):
@@ -244,6 +260,48 @@ def _grade_evidence(golden: dict[str, Any], payload: dict[str, Any]) -> list[Fie
             )
         )
     return checks
+
+
+def _read_cited_input_lines(task: TimingDiagnosisTask, evidence_items: list[str]) -> list[str]:
+    """Resolve ``input/path:line`` evidence refs to source text for grading.
+
+    Agents are instructed to cite concrete ``input/...:line`` references, while
+    goldens may require an error code or phrase that appears on that cited line.
+    Only task-visible ``input/`` files are dereferenced.
+    """
+    input_root = (task.root / "input").resolve()
+    file_cache: dict[Path, list[str]] = {}
+    cited_lines: list[str] = []
+
+    for item in evidence_items:
+        for match in _INPUT_LINE_REF_RE.finditer(item):
+            ref_path = (task.root / match.group("path")).resolve()
+            try:
+                ref_path.relative_to(input_root)
+            except ValueError:
+                continue
+            if not ref_path.is_file():
+                continue
+
+            start = int(match.group("start"))
+            end = int(match.group("end") or start)
+            if start < 1:
+                continue
+            if end < start:
+                start, end = end, start
+            end = min(end, start + 19)
+
+            lines = file_cache.get(ref_path)
+            if lines is None:
+                lines = ref_path.read_text(encoding="utf-8", errors="replace").splitlines()
+                file_cache[ref_path] = lines
+
+            context_start = max(1, start - _EVIDENCE_CONTEXT_RADIUS)
+            context_end = min(end + _EVIDENCE_CONTEXT_RADIUS, len(lines))
+            for line_no in range(context_start, context_end + 1):
+                cited_lines.append(f"{match.group('path')}:{line_no}: {lines[line_no - 1]}")
+
+    return cited_lines
 
 
 def _grade_next_action_terms(golden: dict[str, Any], payload: dict[str, Any]) -> list[FieldCheck]:
@@ -265,6 +323,80 @@ def _grade_next_action_terms(golden: dict[str, Any], payload: dict[str, Any]) ->
 def _matches_expected(observed: Any, expected: Any) -> bool:
     candidates = expected if isinstance(expected, list) else [expected]
     return any(_normalise(observed) == _normalise(candidate) for candidate in candidates)
+
+
+_ROOT_CAUSE_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "by",
+    "from",
+    "in",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "when",
+    "with",
+}
+_ROOT_CAUSE_LEMMAS = {
+    "blocked": "block",
+    "disabled": "disable",
+    "dominates": "dominate",
+    "enabled": "enable",
+    "hangs": "hang",
+    "loops": "loop",
+    "metrics": "metric",
+    "violations": "violation",
+}
+_ROOT_CAUSE_ALIASES = {
+    "grt": ("global", "route"),
+}
+
+
+def _matches_root_cause(observed: Any, expected: Any) -> bool:
+    if _matches_expected(observed, expected):
+        return True
+    if not isinstance(observed, str):
+        return False
+
+    observed_tokens = _root_cause_tokens(observed)
+    candidates = expected if isinstance(expected, list) else [expected]
+    return any(
+        isinstance(candidate, str)
+        and _root_cause_token_match(observed_tokens, _root_cause_tokens(candidate))
+        for candidate in candidates
+    )
+
+
+def _root_cause_token_match(observed: set[str], expected: set[str]) -> bool:
+    if not observed or not expected:
+        return False
+
+    overlap = len(observed & expected)
+    if len(expected) <= 2:
+        return overlap == len(expected)
+
+    required_overlap = max(2, round(0.6 * len(expected)))
+    return overlap >= required_overlap
+
+
+def _root_cause_tokens(value: str) -> set[str]:
+    tokens: set[str] = set()
+    for token in re.findall(r"[a-z0-9]+", value.lower()):
+        if token in _ROOT_CAUSE_STOPWORDS:
+            continue
+        aliases = _ROOT_CAUSE_ALIASES.get(token)
+        if aliases is not None:
+            tokens.update(aliases)
+            continue
+        normalized = _ROOT_CAUSE_LEMMAS.get(token, token)
+        if len(normalized) > 4 and normalized.endswith("s"):
+            normalized = normalized[:-1]
+        if normalized and normalized not in _ROOT_CAUSE_STOPWORDS:
+            tokens.add(normalized)
+    return tokens
 
 
 def _normalise(value: Any) -> Any:

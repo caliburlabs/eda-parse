@@ -129,3 +129,59 @@ def test_grader_accepts_clock_port_mismatch_answer() -> None:
 
     assert report.passed is True
 
+
+def test_grader_resolves_cited_evidence_line_content() -> None:
+    report = grade_submission(
+        TASKS_ROOT / "authority_001_ol_1371_hold_repair_setup_conflict",
+        {
+            "failing_stage": "static_timing",
+            "violation_type": "hold",
+            "root_cause": "hold_repair_blocked_by_setup_margin_guard",
+            "evidence": ["input/16-resizer.log:104"],
+            "next_action": "Set GLB_RESIZER_ALLOW_SETUP_VIOS=1 for the hold repair pass.",
+            "confidence": 0.86,
+        },
+    )
+
+    assert report.passed is True
+    assert report.score == 1.0
+
+
+def test_grader_accepts_nearby_cited_evidence_line_content() -> None:
+    report = grade_submission(
+        TASKS_ROOT / "authority_002_ol_958_report_clock_skew_feedback_loop",
+        {
+            "failing_stage": "static_timing",
+            "violation_type": "other",
+            "root_cause": "opensta_report_clock_skew_combinational_feedback_loop_hang",
+            "evidence": [
+                "input/standalone/sta_clock_skew_excerpt.tcl:7",
+                "input/thread_excerpt.md:35",
+            ],
+            "next_action": "Use the OpenROAD e3315ba41 fix.",
+            "confidence": 0.86,
+        },
+    )
+
+    assert report.passed is True
+    assert report.score == 1.0
+
+
+def test_authority_root_cause_accepts_token_paraphrase() -> None:
+    report = grade_submission(
+        TASKS_ROOT / "authority_003_or_4833_report_metrics_bottleneck",
+        {
+            "failing_stage": "global_route",
+            "violation_type": "other",
+            "root_cause": "report_metrics_dominates_grt_runtime",
+            "evidence": [
+                "input/logs/5_1_grt.tmp.log:61",
+                "input/scripts/global_route_tail.tcl:12",
+            ],
+            "next_action": "Set SKIP_REPORT_METRICS=1 for the immediate rerun.",
+            "confidence": 0.86,
+        },
+    )
+
+    assert report.passed is True
+    assert report.score == 1.0

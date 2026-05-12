@@ -46,6 +46,12 @@ Must equal `task.json`'s `oracle_type`. Harness checks this too.
 ### `required_exact` (object, required, may be empty)
 
 Map of `field_name -> expected_value` checked with case-insensitive whitespace-normalised string equality.
+For `root_cause` on `external_authority` tasks, the grader also accepts close
+snake_case paraphrases with substantial token overlap against one listed
+answer. This keeps authority cases from failing solely because a model wrote
+`report_metrics_dominates_grt_runtime` instead of
+`post_global_route_report_metrics_dominates_runtime`. Other exact fields stay
+strict.
 
 The `expected_value` may be:
 
@@ -92,7 +98,15 @@ When the case has no required numerics (common for authority cases that test rea
 
 ### `required_evidence` (list of strings, required, may be empty)
 
-The grader checks each token is a **case-insensitive substring** of the agent's joined `evidence[]` array. Use this to require that the agent cite specific source files or tool error codes by name.
+The grader checks each token is a **case-insensitive substring** of either:
+
+- the agent's joined `evidence[]` array, or
+- the contents of the task-visible `input/...:line` references cited there,
+  including a small nearby-line context window.
+
+Use this to require that the agent cite specific source files or tool error
+codes by name. The grader only dereferences files under the task's visible
+`input/` directory; hidden oracles are never searched.
 
 ```json
 "required_evidence": [
@@ -104,12 +118,14 @@ The grader checks each token is a **case-insensitive substring** of the agent's 
 The agent emits something like:
 ```json
 "evidence": [
-  "input/16-resizer.log:824 RSZ-0064 Unable to repair...",
+  "input/16-resizer.log:824",
   "input/reproducer/run.sh:35 GLB_RESIZER_ALLOW_SETUP_VIOS=0"
 ]
 ```
 
-Both required tokens (`16-resizer.log` and `RSZ-0064`) appear in the joined string → both pass.
+`16-resizer.log` appears in the evidence reference, and `RSZ-0064` appears on
+the cited line or its small nearby context in the input artifact, so both
+required tokens pass.
 
 Don't over-require. Two to four tokens is usually right. Each token represents *one fact the agent must have looked at*.
 
