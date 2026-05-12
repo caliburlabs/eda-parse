@@ -1,0 +1,44 @@
+#!/bin/sh
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+cd $dir;
+export GLB_RESIZER_HOLD_SLACK_MARGIN='0.05';
+export PACKAGED_SCRIPT_3='openlane/scripts/openroad/set_routing_layers.tcl';
+export GRT_LAYER_ADJUSTMENTS='0.99,0,0,0,0,0';
+export CELL_PAD_EXCLUDE='sky130_fd_sc_hd__tap* sky130_fd_sc_hd__decap* sky130_ef_sc_hd__decap* sky130_fd_sc_hd__fill*';
+export GLB_RESIZER_SETUP_SLACK_MARGIN='0.025';
+export CLOCK_PORT='core_clk rtc_clk';
+export MERGED_LEF='./tmp/merged.nom.lef';
+export SCRIPTS_DIR='openlane/scripts';
+export PACKAGED_SCRIPT_2='./tmp/routing/16-resizer_timing.sdc';
+export GRT_OVERFLOW_ITERS='50';
+export PACKAGED_SCRIPT_4='openlane/scripts/openroad/layer_adjustments.tcl';
+export GRT_ADJUSTMENT='0.3';
+export PACKAGED_SCRIPT_5='openlane/scripts/openroad/set_rc.tcl';
+export RUN_STANDALONE='1';
+export CURRENT_NETLIST='./results/cts/ycr4_iconnect.resized.v';
+export GLB_RESIZER_SETUP_MAX_BUFFER_PERCENT='50';
+export SAVE_SDC='./tmp/routing/16-resizer_timing.sdc';
+export DESIGN_NAME='ycr4_iconnect';
+export GLB_RESIZER_HOLD_MAX_BUFFER_PERCENT='50';
+export STA_PRE_CTS='1';
+export TECH_METAL_LAYERS='li1 met1 met2 met3 met4 met5';
+export SAVE_DEF='./out.def';
+export WIRE_RC_LAYER='met1';
+export LIB_RESIZER_OPT='./tmp/synthesis/resizer_sky130_fd_sc_hd__tt_025C_1v80.lib';
+export RT_MAX_LAYER='met4';
+export CURRENT_DEF='./in.def';
+export DPL_CELL_PADDING='4';
+export GLB_OPTIMIZE_MIRRORING='1';
+export PACKAGED_SCRIPT_7='openlane/scripts/openroad/sta.tcl';
+export STA_LEF='./tmp/merged.nom.lef';
+export GRT_ALLOW_CONGESTION='0';
+export GLB_RESIZER_ALLOW_SETUP_VIOS='0';
+export CURRENT_SDC='./tmp/cts/14-resizer_timing.sdc';
+export RT_MIN_LAYER='met1';
+export DONT_USE_CELLS='sky130_fd_sc_hd__a2111oi_0 sky130_fd_sc_hd__a21boi_0 sky130_fd_sc_hd__and2_0 sky130_fd_sc_hd__buf_16 sky130_fd_sc_hd__clkdlybuf4s15_1 sky130_fd_sc_hd__clkdlybuf4s18_1 sky130_fd_sc_hd__fa_4 sky130_fd_sc_hd__lpflow_bleeder_1 sky130_fd_sc_hd__lpflow_clkbufkapwr_1 sky130_fd_sc_hd__lpflow_clkbufkapwr_16 sky130_fd_sc_hd__lpflow_clkbufkapwr_2 sky130_fd_sc_hd__lpflow_clkbufkapwr_4 sky130_fd_sc_hd__lpflow_clkbufkapwr_8 sky130_fd_sc_hd__lpflow_clkinvkapwr_1 sky130_fd_sc_hd__lpflow_clkinvkapwr_16 sky130_fd_sc_hd__lpflow_clkinvkapwr_2 sky130_fd_sc_hd__lpflow_clkinvkapwr_4 sky130_fd_sc_hd__lpflow_clkinvkapwr_8 sky130_fd_sc_hd__lpflow_decapkapwr_12 sky130_fd_sc_hd__lpflow_decapkapwr_3 sky130_fd_sc_hd__lpflow_decapkapwr_4 sky130_fd_sc_hd__lpflow_decapkapwr_6 sky130_fd_sc_hd__lpflow_decapkapwr_8 sky130_fd_sc_hd__lpflow_inputiso0n_1 sky130_fd_sc_hd__lpflow_inputiso0p_1 sky130_fd_sc_hd__lpflow_inputiso1n_1 sky130_fd_sc_hd__lpflow_inputiso1p_1 sky130_fd_sc_hd__lpflow_inputisolatch_1 sky130_fd_sc_hd__lpflow_isobufsrc_1 sky130_fd_sc_hd__lpflow_isobufsrc_16 sky130_fd_sc_hd__lpflow_isobufsrc_2 sky130_fd_sc_hd__lpflow_isobufsrc_4 sky130_fd_sc_hd__lpflow_isobufsrc_8 sky130_fd_sc_hd__lpflow_isobufsrckapwr_16 sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1 sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2 sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4 sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4 sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1 sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2 sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4 sky130_fd_sc_hd__mux4_4 sky130_fd_sc_hd__o21ai_0 sky130_fd_sc_hd__o311ai_0 sky130_fd_sc_hd__or2_0 sky130_fd_sc_hd__probe_p_8 sky130_fd_sc_hd__probec_p_8 sky130_fd_sc_hd__xor3_1 sky130_fd_sc_hd__xor3_2 sky130_fd_sc_hd__xor3_4 sky130_fd_sc_hd__xnor3_1 sky130_fd_sc_hd__xnor3_2 sky130_fd_sc_hd__xnor3_4  ';
+export PACKAGED_SCRIPT_1='./tmp/cts/14-resizer_timing.sdc';
+export PACKAGED_SCRIPT_6='openlane/scripts/openroad/dpl_cell_pad.tcl';
+export LIB_SYNTH_COMPLETE='pdk/sky130B/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib';
+export PACKAGED_SCRIPT_0='openlane/scripts/openroad/resizer_routing_timing.tcl';
+TOOL_BIN=${TOOL_BIN:-openroad}
+$TOOL_BIN -exit $PACKAGED_SCRIPT_0

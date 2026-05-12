@@ -1,0 +1,17 @@
+{
+  "task_id": "authority_001_ol_1371_hold_repair_setup_conflict",
+  "title": "OpenLane #1371: hold repair gives up when setup also violates (ycr4_iconnect)",
+  "oracle_type": "external_authority",
+  "oracle_status": "github_issue_maintainer_resolution",
+  "prompt": "prompt.md",
+  "golden": "hidden_oracle/golden.json",
+  "input_artifacts": [
+    "input/16-resizer.log",
+    "input/reproducer/run.sh",
+    "input/reproducer/run.tcl",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl",
+    "input/reproducer/openlane/scripts/openroad/sta.tcl",
+    "input/reproducer/tmp/cts/14-resizer_timing.sdc",
+    "input/reproducer/tmp/routing/16-resizer_timing.sdc"
+  ]
+}

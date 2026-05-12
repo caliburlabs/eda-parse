@@ -1,0 +1,42 @@
+{
+  "task_id": "authority_001_ol_1371_hold_repair_setup_conflict",
+  "oracle_type": "external_authority",
+  "provenance": {
+    "status": "github_issue_maintainer_resolution",
+    "source_url": "https://github.com/The-OpenROAD-Project/OpenLane/issues/1371",
+    "fix_commit": "openroad 79313e90d",
+    "fix_file_path": "src/rsz/src/RepairHold.cc",
+    "user_workaround_env_var": "GLB_RESIZER_ALLOW_SETUP_VIOS",
+    "alternative_workaround": "increase clock period from 10 to 16 ns so setup repair can converge first",
+    "authorities": [
+      {"github": "jjcherry56", "name": "James Cherry", "role": "OpenSTA author / Parallax Software"},
+      {"github": "antonblanchard", "name": "Anton Blanchard", "role": "IBM / Linux kernel maintainer"},
+      {"github": "donn", "name": "Mohamed Gaber", "role": "OpenLane lead maintainer"}
+    ],
+    "verbatim_diagnosis_path": "hidden_oracle/provenance.md",
+    "note": "Maintainer-sealed answer key. Verbatim quotes and audit trail live in provenance.md alongside this golden.json."
+  },
+  "required_exact": {
+    "failing_stage": [
+      "static_timing",
+      "place_and_route",
+      "post_route_timing_repair",
+      "hold_repair"
+    ],
+    "violation_type": "hold",
+    "root_cause": [
+      "hold_repair_blocked_by_setup_violations",
+      "setup_violations_block_hold_repair",
+      "hold_fixup_disabled_when_setup_violates",
+      "allow_setup_violations_disabled"
+    ]
+  },
+  "required_numeric": {},
+  "required_evidence": [
+    "16-resizer.log",
+    "RSZ-0064"
+  ],
+  "required_next_action_terms": [
+    "GLB_RESIZER_ALLOW_SETUP_VIOS"
+  ]
+}

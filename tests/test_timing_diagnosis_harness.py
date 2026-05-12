@@ -14,13 +14,21 @@ TASKS_ROOT = (
 
 def test_timing_diagnosis_tasks_validate() -> None:
     tasks = iter_tasks(TASKS_ROOT)
+    task_ids = {task.task_id for task in tasks}
 
-    assert [task.task_id for task in tasks] == [
+    # The three first-principles physics seeds must always be present —
+    # they're the harness fixtures.
+    required_seeds = {
         "physics_001_overconstrained_clock",
         "physics_002_missing_input_delay",
         "physics_003_unconstrained_paths",
-    ]
+    }
+    assert required_seeds.issubset(task_ids), (
+        f"missing physics seeds: {sorted(required_seeds - task_ids)}"
+    )
 
+    # Every loaded task must validate structurally — covers physics seeds,
+    # external_authority cases, and any future external_tool cases.
     for task in tasks:
         checks = validate_task(task)
         assert all(check.passed for check in checks), [
