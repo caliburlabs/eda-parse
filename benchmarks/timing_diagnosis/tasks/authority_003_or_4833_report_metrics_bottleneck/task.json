@@ -1,0 +1,13 @@
+{
+  "task_id": "authority_003_or_4833_report_metrics_bottleneck",
+  "title": "OpenROAD #4833: the apparent antenna slowdown is really report_metrics",
+  "oracle_type": "external_authority",
+  "oracle_status": "github_issue_maintainer_resolution",
+  "prompt": "prompt.md",
+  "golden": "hidden_oracle/golden.json",
+  "input_artifacts": [
+    "input/logs/5_1_grt.tmp.log",
+    "input/scripts/global_route_tail.tcl",
+    "input/thread_excerpt.md"
+  ]
+}

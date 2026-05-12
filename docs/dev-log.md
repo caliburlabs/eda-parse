@@ -93,3 +93,70 @@ Added the documents that let other agents pick up work without re-deriving the p
 - **`docs/why.md`** — updated with SemiAnalysis 2026 framing: 50%/year complexity vs 20%/year productivity gap; verification = 70% of effort; Big Three (Synopsys/Cadence/Siemens) + NVIDIA all have private agentic flows; the wedge is openness + observability + measurement, not building a better closed agent.
 
 These are durable; future agents in cold-context sessions can pick up where this one left off without losing the principles.
+
+## Curation converter (2026-05-12)
+
+Added `tools/convert_curation_to_golden.py` so the authority backlog no longer depends on
+manual copy/paste between research-Claude's rich curation dumps and the bench oracle shape.
+
+The converter accepts:
+
+- the rich markdown dump format with headings like
+  `tasks/OL-1371/hidden_oracle/golden.json`
+- or raw JSON containing the same rich case payloads
+- a separate overlay keyed by `case_id` that supplies the grader contract fields the rich
+  dump intentionally does **not** specify (`required_exact`, `required_numeric`,
+  `required_evidence`, `required_next_action_terms`, plus the final bench `task_id`)
+
+That split is intentional. Verbatim maintainer quotes, fix metadata, and attribution flow
+into `provenance.md`; benchmark truth still comes from an explicit hand-reviewed overlay
+rather than heuristically "understanding" rubric prose. Focused tests now cover extraction,
+golden assembly, provenance rendering, and on-disk conversion.
+
+## Authority cases 002 and 003 (2026-05-12)
+
+Wired the two adversarial authority cases called out in the bench design:
+
+- `authority_002_ol_958_report_clock_skew_feedback_loop`
+- `authority_003_or_4833_report_metrics_bottleneck`
+
+Both were re-verified against the live GitHub issue threads before wiring. `OL-958`
+preserves Cherry's explicit rejection of the misleading clockless-design comment and the
+`OpenROAD e3315ba41` fix note. `OR-4833` preserves Eder Matheus Monteiro's rerun showing the
+issue title misattributes the stall to antenna repair when the real two-hour bottleneck is
+`report_metrics`.
+
+Input trimming mattered:
+
+- `OL-958` had multi-megabyte attached packages; the task keeps the small standalone Tcl
+  testcase, the load-bearing `sta.tcl` excerpt, and a public-thread excerpt.
+- `OR-4833` pointed to a 473 MB BoomTile tarball; the task keeps only the small GRT log tail,
+  the post-route Tcl tail, and a public-thread excerpt.
+
+The grader-facing goldens/provenance for both tasks are generated from the preserved rich
+curation payload through `tools/convert_curation_to_golden.py`, using the checked-in overlay
+file `benchmarks/timing_diagnosis/curation_overlays/authority_002_003.json`.
+
+## First real authority-tier runs + grader calibration (2026-05-12)
+
+Ran Claude Opus 4.7 with high effort against `authority_001`, `authority_002`, and
+`authority_003`. The first pass exposed benchmark calibration bugs rather than subject-agent
+diagnosis failures:
+
+- evidence tokens like `RSZ-0064` were unsatisfiable when the answer schema asked for
+  `input/path:line` references rather than pasted source text
+- legitimate `root_cause` paraphrases failed strict whole-string matching
+- `read_file` returned raw text without line numbers, making exact evidence citations easy to
+  drift by one or two lines
+
+The instrument was tightened accordingly:
+
+- evidence grading now dereferences visible `input/...:line` citations, with a small local context
+  window for pre-line-number runs
+- authority-tier `root_cause` values keep exact matching first, then accept bounded token-overlap
+  paraphrases
+- `read_file` returns 1-based line-numbered content
+
+After those changes, all three real answers regrade PASS at 100%. The preserved run artifacts
+live under `evidence/v0_first_real_runs/`; they include the final structured answers and the
+tool-call transcripts, plus the useful retry wrapper log for `authority_001`.

@@ -1,0 +1,62 @@
+{
+  "OL-958": {
+    "task_id": "authority_002_ol_958_report_clock_skew_feedback_loop",
+    "required_exact": {
+      "failing_stage": [
+        "static_timing",
+        "sta_report_generation"
+      ],
+      "violation_type": "other",
+      "root_cause": [
+        "report_clock_skew_hangs_on_combinational_feedback_loops",
+        "combinational_feedback_loop_in_report_clock_skew",
+        "clock_skew_hang_from_combinational_feedback"
+      ]
+    },
+    "required_numeric": {},
+    "required_evidence": [
+      "sta_clock_skew_excerpt.tcl",
+      "thread_excerpt.md",
+      "report_clock_skew"
+    ],
+    "required_next_action_terms": [
+      "e3315ba41"
+    ],
+    "provenance": {
+      "status": "github_issue_maintainer_resolution",
+      "input_strategy": "Archived public issue-thread excerpt plus the minimal attached STA scripts needed to expose the misleading source comment."
+    }
+  },
+  "OR-4833": {
+    "task_id": "authority_003_or_4833_report_metrics_bottleneck",
+    "required_exact": {
+      "failing_stage": [
+        "place_and_route",
+        "global_route",
+        "post_global_route_reporting"
+      ],
+      "violation_type": "other",
+      "root_cause": [
+        "report_metrics_bottleneck",
+        "runtime_misattributed_to_antenna_repair",
+        "post_global_route_report_metrics_dominates_runtime"
+      ]
+    },
+    "required_numeric": {},
+    "required_evidence": [
+      "5_1_grt.tmp.log",
+      "global_route_tail.tcl",
+      "report_metrics"
+    ],
+    "required_next_action_terms": [
+      "SKIP_REPORT_METRICS"
+    ],
+    "provenance": {
+      "status": "github_issue_maintainer_resolution",
+      "state": "closed",
+      "state_evidence": "Live GitHub issue state re-verified as CLOSED on 2026-05-12.",
+      "verification_note": "The rich curation payload carried an earlier 'closed inferred' caveat. Live re-verification on 2026-05-12 removed that ambiguity.",
+      "input_strategy": "The 473 MB BoomTile tarball was mined for the small global-route log and Tcl tail that make the maintainer diagnosis inspectable without vendoring the full bundle."
+    }
+  }
+}

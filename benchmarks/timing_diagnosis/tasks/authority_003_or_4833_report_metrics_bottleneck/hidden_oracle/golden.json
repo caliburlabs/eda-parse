@@ -1,0 +1,54 @@
+{
+  "task_id": "authority_003_or_4833_report_metrics_bottleneck",
+  "oracle_type": "external_authority",
+  "provenance": {
+    "status": "github_issue_maintainer_resolution",
+    "source_url": "https://github.com/The-OpenROAD-Project/OpenROAD/issues/4833",
+    "verbatim_diagnosis_path": "hidden_oracle/provenance.md",
+    "note": "Generated from rich curation metadata. Grader-facing requirements came from an explicit overlay, not from free-form rubric text.",
+    "rich_case_id": "OR-4833",
+    "state": "closed",
+    "state_evidence": "Live GitHub issue state re-verified as CLOSED on 2026-05-12.",
+    "category": "misleading-title / surface-vs-real-bottleneck",
+    "difficulty": "hard",
+    "tier": 1,
+    "fix_pr": "OpenROAD-flow-scripts #2063 (parallelization of check_antennas and repair_antennas)",
+    "actual_bottleneck": "report_metrics",
+    "authorities": [
+      {
+        "github": "eder-matheus",
+        "name": "Eder Matheus Monteiro",
+        "role": "UFRGS / OpenROAD core dev"
+      },
+      {
+        "github": "maliberty",
+        "name": "Matt Liberty",
+        "role": "OpenROAD core / UCSD"
+      }
+    ],
+    "verification_note": "The rich curation payload carried an earlier 'closed inferred' caveat. Live re-verification on 2026-05-12 removed that ambiguity.",
+    "input_strategy": "The 473 MB BoomTile tarball was mined for the small global-route log and Tcl tail that make the maintainer diagnosis inspectable without vendoring the full bundle."
+  },
+  "required_exact": {
+    "failing_stage": [
+      "place_and_route",
+      "global_route",
+      "post_global_route_reporting"
+    ],
+    "violation_type": "other",
+    "root_cause": [
+      "report_metrics_bottleneck",
+      "runtime_misattributed_to_antenna_repair",
+      "post_global_route_report_metrics_dominates_runtime"
+    ]
+  },
+  "required_numeric": {},
+  "required_evidence": [
+    "5_1_grt.tmp.log",
+    "global_route_tail.tcl",
+    "report_metrics"
+  ],
+  "required_next_action_terms": [
+    "SKIP_REPORT_METRICS"
+  ]
+}

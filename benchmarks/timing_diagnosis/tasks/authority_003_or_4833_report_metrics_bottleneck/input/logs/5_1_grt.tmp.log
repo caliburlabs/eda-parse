@@ -1,0 +1,67 @@
+OpenROAD v2.0-12680-gc2b1d565b
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+global_route -guide_file bazel-out/k8-fastbuild/bin/results/asap7/BoomTile/base/route.guide -congestion_report_file bazel-out/k8-fastbuild/bin/reports/asap7/BoomTile/base/congestion.rpt -congestion_iterations 30 -congestion_report_iter_step 5 -verbose
+[INFO GRT-0020] Min routing layer: M2
+[INFO GRT-0021] Max routing layer: M7
+[INFO GRT-0022] Global adjustment: 0%
+[INFO GRT-0023] Grid origin: (0, 0)
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0088] Layer M1      Track-Pitch = 0.0360  line-2-Via Pitch: 0.0360
+[INFO GRT-0088] Layer M2      Track-Pitch = 0.0390  line-2-Via Pitch: 0.0360
+[INFO GRT-0088] Layer M3      Track-Pitch = 0.0360  line-2-Via Pitch: 0.0360
+[INFO GRT-0088] Layer M4      Track-Pitch = 0.0480  line-2-Via Pitch: 0.0480
+[INFO GRT-0088] Layer M5      Track-Pitch = 0.0480  line-2-Via Pitch: 0.0480
+[INFO GRT-0088] Layer M6      Track-Pitch = 0.0640  line-2-Via Pitch: 0.0640
+[INFO GRT-0088] Layer M7      Track-Pitch = 0.0640  line-2-Via Pitch: 0.0640
+[INFO GRT-0019] Found 18847 clock nets.
+[INFO GRT-0001] Minimum degree: 2
+[INFO GRT-0002] Maximum degree: 217
+[INFO GRT-0003] Macros: 72
+[INFO GRT-0004] Blockages: 746004
+
+[INFO GRT-0053] Routing resources analysis:
+          Routing      Original      Derated      Resource
+Layer     Direction    Resources     Resources    Reduction (%)
+---------------------------------------------------------------
+M1         Vertical            0             0          0.00%
+M2         Horizontal   95934552      33546961          65.03%
+M3         Vertical     110687864      45652441          58.76%
+M4         Horizontal   81173092      33753225          58.42%
+M5         Vertical     81173092      28729394          64.61%
+M6         Horizontal   59034976      21972679          62.78%
+M7         Vertical     59034976      27014200          54.24%
+---------------------------------------------------------------
+
+[INFO GRT-0101] Running extra iterations to remove overflow.
+[INFO GRT-0197] Via related to pin nodes: 14672195
+[INFO GRT-0198] Via related Steiner nodes: 875677
+[INFO GRT-0199] Via filling finished.
+[INFO GRT-0111] Final number of vias: 21602716
+[INFO GRT-0112] Final usage 3D: 122816530
+
+[INFO GRT-0096] Final congestion report:
+Layer         Resource        Demand        Usage (%)    Max H / Max V / Total Overflow
+---------------------------------------------------------------------------------------
+M1                   0             0            0.00%             0 /  0 /  0
+M2            33546961       12998005           38.75%             0 /  0 /  0
+M3            45652441       18749496           41.07%             0 /  0 /  0
+M4            33753225       11316179           33.53%             0 /  0 /  0
+M5            28729394       8018516           27.91%             0 /  0 /  0
+M6            21972679       4105254           18.68%             0 /  0 /  0
+M7            27014200       2820932           10.44%             0 /  0 /  0
+---------------------------------------------------------------------------------------
+Total        190668900       58008382           30.42%             0 /  0 /  0
+
+[INFO GRT-0018] Total wirelength: 35929953 um
+[INFO GRT-0014] Routed nets: 1953749
+[WARNING STA-0450] virtual clock clock_vir can not be propagated.
+
+==========================================================================
+check_antennas
+--------------------------------------------------------------------------
+[WARNING GRT-0246] No diode with LEF class CORE ANTENNACELL found.
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO ANT-0002] Found 0 net violations.
+[INFO ANT-0001] Found 0 pin violations.
+Warning: There are 3785 unconstrained endpoints.

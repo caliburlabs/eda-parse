@@ -1,0 +1,20 @@
+{
+  "failing_stage": "static_timing",
+  "violation_type": "other",
+  "root_cause": "opensta_report_clock_skew_combinational_feedback_loop_hang",
+  "clock": "Clk",
+  "evidence": [
+    "input/standalone/bug.tcl:6",
+    "input/standalone/bug.tcl:9",
+    "input/standalone/sta_clock_skew_excerpt.tcl:2",
+    "input/standalone/sta_clock_skew_excerpt.tcl:7",
+    "input/thread_excerpt.md:30",
+    "input/thread_excerpt.md:33",
+    "input/thread_excerpt.md:36"
+  ],
+  "next_action": "Bump OpenLane's pinned OpenROAD/OpenSTA to a build that includes OpenROAD commit e3315ba41 (jjcherry56's fix for report_clock_skew hanging on combinational feedback loops), and delete the misleading 'OR hangs ... on clockless designs' comment plus the CLOCK_PORT guard in sta.tcl / multiple_corners.tcl now that the underlying bug is fixed.",
+  "confidence": 0.92,
+  "source_comment_correct": false,
+  "actual_trigger": "combinational_feedback_loops_in_report_clock_skew",
+  "openroad_fix_commit": "e3315ba41"
+}

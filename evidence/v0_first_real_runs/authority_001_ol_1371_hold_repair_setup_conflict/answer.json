@@ -1,0 +1,33 @@
+{
+  "clock": "core_clk",
+  "confidence": 0.86,
+  "evidence": [
+    "input/16-resizer.log:101",
+    "input/16-resizer.log:102",
+    "input/16-resizer.log:103",
+    "input/16-resizer.log:104",
+    "input/16-resizer.log:820",
+    "input/16-resizer.log:4426",
+    "input/16-resizer.log:4433",
+    "input/16-resizer.log:4440",
+    "input/16-resizer.log:4445",
+    "input/16-resizer.log:4417",
+    "input/reproducer/run.sh:11",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:60",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:66",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:68",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:69",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:71",
+    "input/reproducer/openlane/scripts/openroad/resizer_routing_timing.tcl:72"
+  ],
+  "failing_stage": "static_timing",
+  "next_action": "In the OpenLane configuration, set GLB_RESIZER_ALLOW_SETUP_VIOS=1 so that the post-GRT repair_timing -hold call is invoked with -allow_setup_violations. As the resizer_routing_timing.tcl script shows, without that flag hold repair is constrained by -setup_margin 0.025; since the prior repair_timing -setup pass already left setup WNS at -5.67 ns / TNS -1944.95 ns (RSZ-0062 'Unable to repair all setup violations'), every candidate hold-fixing delay-buffer (dlygate4sd3) is rejected because it would push the already-violating setup path further negative, so 5 hold endpoints remain (worst -0.36 ns on core_dmem_req_ack -> _7275_). Enabling -allow_setup_violations lets hold repair converge; the residual setup problem (driven here by an over-loaded CTS with 24 max-fanout violations on clkbuf_leaf_*) should be tackled separately by relaxing the clock period or rerunning CTS with tighter max_fanout, but the immediate flow-level switch that unblocks hold closure is GLB_RESIZER_ALLOW_SETUP_VIOS=1.",
+  "root_cause": "hold_repair_blocked_by_setup_margin_guard",
+  "violation_type": "hold",
+  "worst_slack_ns": -0.36,
+  "setup_wns_ns": -5.67,
+  "setup_tns_ns": -1944.95,
+  "hold_wns_ns": -0.36,
+  "hold_endpoints_failing": 5,
+  "env_var": "GLB_RESIZER_ALLOW_SETUP_VIOS"
+}

@@ -1,0 +1,25 @@
+{
+  "failing_stage": "place_and_route",
+  "violation_type": "other",
+  "root_cause": "report_metrics_dominates_grt_runtime",
+  "evidence": [
+    "input/thread_excerpt.md:28",
+    "input/thread_excerpt.md:32",
+    "input/scripts/global_route_tail.tcl:5",
+    "input/scripts/global_route_tail.tcl:10",
+    "input/scripts/global_route_tail.tcl:11",
+    "input/logs/5_1_grt.tmp.log:43",
+    "input/logs/5_1_grt.tmp.log:48"
+  ],
+  "next_action": "Set the SKIP_REPORT_METRICS environment variable (already supported by the ORFS global-route script) so that the report_metrics 5 \"global route\" call after estimate_parasitics is bypassed; the maintainer's timed breakdown shows report_metrics consumes ~2 hours while repair_antennas/check_antennas only take ~4 minutes with parallelization.",
+  "confidence": 0.95,
+  "bottleneck_stage": "report_metrics",
+  "issue_title_misleading": true,
+  "measured_runtimes": {
+    "grt_plus_incremental_minutes": 54,
+    "repair_and_check_antennas_minutes": 4,
+    "estimate_parasitics_minutes": 2.5,
+    "report_metrics_minutes": 120
+  },
+  "mitigation_flag": "SKIP_REPORT_METRICS"
+}

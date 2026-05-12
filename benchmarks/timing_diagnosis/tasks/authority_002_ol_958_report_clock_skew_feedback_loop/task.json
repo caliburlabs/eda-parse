@@ -1,0 +1,13 @@
+{
+  "task_id": "authority_002_ol_958_report_clock_skew_feedback_loop",
+  "title": "OpenLane #958: report_clock_skew hang despite a misleading clockless-design comment",
+  "oracle_type": "external_authority",
+  "oracle_status": "github_issue_maintainer_resolution",
+  "prompt": "prompt.md",
+  "golden": "hidden_oracle/golden.json",
+  "input_artifacts": [
+    "input/standalone/bug.tcl",
+    "input/standalone/sta_clock_skew_excerpt.tcl",
+    "input/thread_excerpt.md"
+  ]
+}
